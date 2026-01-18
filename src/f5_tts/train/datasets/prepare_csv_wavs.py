@@ -23,7 +23,7 @@ from tqdm import tqdm
 from f5_tts.model.utils import convert_char_to_pinyin
 
 
-PRETRAINED_VOCAB_PATH = files("f5_tts").joinpath("../../data/Emilia_ZH_EN_pinyin/vocab.txt")
+PRETRAINED_VOCAB_PATH = files("f5_tts").joinpath("../../data/vocab_lithuanian.txt")
 
 
 def is_csv_wavs_format(input_dataset_dir):
@@ -79,17 +79,23 @@ def process_audio_file(audio_path, text, polyphone):
         return None
 
 
-def batch_convert_texts(texts, polyphone, batch_size=BATCH_SIZE):
-    """Convert a list of texts to pinyin in batches."""
+def batch_convert_texts(texts, tokenizer="pinyin", polyphone=True, batch_size=BATCH_SIZE):
+    """Convert a list of texts based on tokenizer type."""
     converted_texts = []
     for i in range(0, len(texts), batch_size):
         batch = texts[i : i + batch_size]
-        converted_batch = convert_char_to_pinyin(batch, polyphone=polyphone)
+        if tokenizer == "pinyin":
+            converted_batch = convert_char_to_pinyin(batch, polyphone=polyphone)
+        elif tokenizer == "char":
+            # Character-based tokenization (no conversion needed)
+            converted_batch = batch
+        else:
+            raise ValueError(f"Unsupported tokenizer: {tokenizer}")
         converted_texts.extend(converted_batch)
     return converted_texts
 
 
-def prepare_csv_wavs_dir(input_dir, num_workers=None):
+def prepare_csv_wavs_dir(input_dir, num_workers=None, tokenizer="char"):
     global executor
     assert is_csv_wavs_format(input_dir), f"not csv_wavs format: {input_dir}"
     input_dir = Path(input_dir)
@@ -139,7 +145,7 @@ def prepare_csv_wavs_dir(input_dir, num_workers=None):
 
     # Batch process text conversion
     raw_texts = [item[1] for item in processed]
-    converted_texts = batch_convert_texts(raw_texts, polyphone, batch_size=BATCH_SIZE)
+    converted_texts = batch_convert_texts(raw_texts, tokenizer=tokenizer, polyphone=polyphone, batch_size=BATCH_SIZE)
 
     # Prepare final results
     sub_result = []
@@ -235,10 +241,10 @@ def save_prepped_dataset(out_dir, result, duration_list, text_vocab_set, is_fine
     print(f"For {dataset_name}, total {sum(duration_list) / 3600:.2f} hours")
 
 
-def prepare_and_save_set(inp_dir, out_dir, is_finetune: bool = True, num_workers: int = None):
+def prepare_and_save_set(inp_dir, out_dir, is_finetune: bool = True, num_workers: int = None, tokenizer: str = "char"):
     if is_finetune:
         assert PRETRAINED_VOCAB_PATH.exists(), f"pretrained vocab.txt not found: {PRETRAINED_VOCAB_PATH}"
-    sub_result, durations, vocab_set = prepare_csv_wavs_dir(inp_dir, num_workers=num_workers)
+    sub_result, durations, vocab_set = prepare_csv_wavs_dir(inp_dir, num_workers=num_workers, tokenizer=tokenizer)
     save_prepped_dataset(out_dir, sub_result, durations, vocab_set, is_finetune)
 
 
@@ -269,9 +275,10 @@ Examples:
         parser.add_argument("out_dir", type=str, help="Output directory to save the prepared data.")
         parser.add_argument("--pretrain", action="store_true", help="Enable for new pretrain, otherwise is a fine-tune")
         parser.add_argument("--workers", type=int, help=f"Number of worker threads (default: {MAX_WORKERS})")
+        parser.add_argument("--tokenizer", type=str, default="char", choices=["pinyin", "char"], help="Tokenizer type: 'pinyin' for Chinese, 'char' for character-based (default: char)")
         args = parser.parse_args()
 
-        prepare_and_save_set(args.inp_dir, args.out_dir, is_finetune=not args.pretrain, num_workers=args.workers)
+        prepare_and_save_set(args.inp_dir, args.out_dir, is_finetune=not args.pretrain, num_workers=args.workers, tokenizer=args.tokenizer)
     except KeyboardInterrupt:
         print("\nOperation cancelled by user. Cleaning up...")
         if executor is not None:
