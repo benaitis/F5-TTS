@@ -125,6 +125,10 @@ python train.py --config your_lithuanian_config.yaml
 python src/f5_tts/train/train.py --config-name F5TTS_Lithuanian.yaml
 ```
 
+```bash
+python src/f5_tts/train/train.py --config-name F5TTS_Lithuanian_small.yaml
+```
+
 ## Key Differences from Chinese Training
 
 | Aspect              | Chinese                                  | Lithuanian                       |
