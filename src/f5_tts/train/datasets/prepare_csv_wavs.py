@@ -23,7 +23,7 @@ from tqdm import tqdm
 from f5_tts.model.utils import convert_char_to_pinyin
 
 
-PRETRAINED_VOCAB_PATH = files("f5_tts").joinpath("../../data/vocab_lithuanian.txt")
+PRETRAINED_VOCAB_PATH = files("f5_tts").joinpath("../../data/LT/vocab_lithuanian.txt")
 
 
 def is_csv_wavs_format(input_dataset_dir):
