@@ -6,6 +6,10 @@ ckpts/
 wandb/
 results/
 
+# Remove datasets
+data/lithuanian_dataset/wavs
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

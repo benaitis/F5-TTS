@@ -91,6 +91,10 @@ python src/f5_tts/train/datasets/prepare_csv_wavs.py \
     --workers 4
 ```
 
+```bash
+python src/f5_tts/train/datasets/prepare_csv_wavs.py data/lithuanian_dataset data/lithuanian_processed_custom --tokenizer char --workers 4
+```
+
 **Parameters explained:**
 
 - `--tokenizer char`: Use character-based tokenization (essential for Lithuanian)
@@ -115,6 +119,10 @@ datasets:
 
 ```bash
 python train.py --config your_lithuanian_config.yaml
+```
+
+```bash
+python src/f5_tts/train/train.py --config-name F5TTS_Lithuanian.yaml
 ```
 
 ## Key Differences from Chinese Training
