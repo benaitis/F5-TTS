@@ -208,6 +208,27 @@ def read_audio_text_pairs(csv_file_path):
 
     return audio_text_pairs
 
+# def read_audio_text_pairs(csv_file_path):
+#     audio_text_pairs = []
+
+#     parent = Path(csv_file_path).parent
+#     wavs_dir = parent / "wavs"
+
+#     with open(csv_file_path, mode="r", newline="", encoding="utf-8-sig") as csvfile:
+#         reader = csv.reader(csvfile, delimiter="|")
+#         next(reader, None)  # skip header if present
+
+#         for row in reader:
+#             if len(row) < 2:
+#                 continue
+
+#             utt_id = row[0].strip()   # e.g. a0001
+#             text = row[1].strip()     # plain text
+
+#             audio_path = wavs_dir / f"{utt_id}"
+#             audio_text_pairs.append((audio_path.as_posix(), text))
+
+#     return audio_text_pairs
 
 def save_prepped_dataset(out_dir, result, duration_list, text_vocab_set, is_finetune):
     out_dir = Path(out_dir)

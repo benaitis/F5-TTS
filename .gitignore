@@ -8,7 +8,8 @@ results/
 
 # Remove datasets
 data/lithuanian_dataset/wavs
-
+data/liepa1/
+data/sint-liepa1-pk-1.0.tar.gz
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
